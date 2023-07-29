@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useState } from "react"
+import useServer from "./useServer"
 
 export default function useSettings() {
     const [id, setId] = useState(-1)
     const [name, setName] = useState('')
+    const {} = useServer()
 
     useEffect(() => {
         const localId = getId()
@@ -10,31 +12,31 @@ export default function useSettings() {
         setName(getName())
     }, [])
 
-    const generateId = useCallback(() => {
+    const generateId = () => {
         const max = 9999999
         const min = 1000000
         return Math.floor(Math.random() * (max - min + 1) + min)
-    }, [])
+    }
 
     const getId = useCallback(() => {
         const localId = localStorage.getItem('id') 
         return localId ?  +localId : 0
     }, [])
 
-    const getName = useCallback(() => {
+    const getName = () => {
         const localName = localStorage.getItem('name')
         return localName
-    }, [])
+    }
 
-    const setLocalId = useCallback((localId) => localStorage.setItem('id', localId), [])
-    const setLocalName = useCallback((localName) => localStorage.setItem('name', localName), [])
-    const clearLocalInfo = useCallback(() => localStorage.clear(), [])
+    const setLocalId = localId => localStorage.setItem('id', localId)
+    const setLocalName = localName => localStorage.setItem('name', localName)
+    const clearLocalInfo = () => localStorage.clear()
 
-    const createPlayer = useCallback((localName) => {
+    const createPlayer = localName => {
        const newId = generateId()
        setLocalId(newId.toString())
        setLocalName(localName)
-    }, [generateId])
+    }
 
     return {
         id,

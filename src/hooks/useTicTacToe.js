@@ -1,25 +1,19 @@
-import { useCallback, useEffect, useState } from "react"
-import useSettings from "./useSettings"
+import { useCallback, useState } from "react"
 
 export default function useTicTacToe() {
-    const { name } = useSettings()
     const [squares, setSquares] = useState(Array(9).fill(null))
     const [message, setMessage] = useState('Vez de: ')
     const [player, setPlayer] = useState('X')
-    const [resetting, setResetting] = useState(false)
+    const [status, setStatus] = useState('playing')
 
     const reset = useCallback(() => {
-        setResetting(true)
-        setTimeout(() => {
-            setSquares(Array(9).fill(null))
-            setMessage('Vez de:')
-            setPlayer('X')
-            setResetting(false)
-        }, 6000)
+        setSquares(Array(9).fill(null))
+        setMessage('Vez de:')
+        setPlayer('X')
+        setStatus('playing')
     }, [])
 
     const handleClick = useCallback((pos) => {
-        //console.log(getId())
         const squaresArray = [...squares]
         if (squaresArray[pos] || calculateWinner(squaresArray)) return
         squaresArray[pos] = player
@@ -29,7 +23,7 @@ export default function useTicTacToe() {
     }, [squares, player])
 
 
-    const calculateWinner = useCallback((squares) => {
+    const calculateWinner = squares => {
         const lines = [
             [0, 1, 2],
             [3, 4, 5],
@@ -46,7 +40,7 @@ export default function useTicTacToe() {
             if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
                 setMessage('Vencedor:')
                 setPlayer(squares[a])
-                //reset()
+                setStatus('end')
                 return squares[a]
             }
         }
@@ -58,18 +52,18 @@ export default function useTicTacToe() {
         if (over) {
             setMessage('Empate')
             setPlayer('')
-            //reset()
+            setStatus('end')
             return true
         }
 
         return null
-    }, [])
+    }
 
     return {
         squares,
         message,
         player,
-        resetting,
+        status,
         handleClick,
         reset
     }

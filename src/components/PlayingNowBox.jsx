@@ -7,7 +7,7 @@ export default function PlayingNowBox({ players }) {
         `}>
             <span className="text-2xl mb-4">Jogando:</span>
             {players.map(player => {
-                return <span key={player}>{player}</span>
+                return <span key={player.id}>{player.name}</span>
             })}
         </div>
     )

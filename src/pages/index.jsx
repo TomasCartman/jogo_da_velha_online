@@ -1,12 +1,9 @@
-'use client'
-
 import '@/styles/globals.css'
 import Game from "@/components/Game"
 import useSettings from '@/hooks/useSettings'
 
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-
 
 export default function index() {
     const { id } = useSettings()
@@ -15,7 +12,7 @@ export default function index() {
     useEffect(() => {
        id || router.replace('/config')
     }, [id])
-    console.log(id)
+
     return (
         <main className={`
             w-full bg-zinc-900 h-screen
