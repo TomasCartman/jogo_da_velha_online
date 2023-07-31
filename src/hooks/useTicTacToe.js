@@ -1,13 +1,34 @@
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
+import { getFirestore, doc, onSnapshot, collection } from 'firebase/firestore'
+import app from '@/backend/index'
+import useServer from "./useServer"
 
 export default function useTicTacToe() {
     const [squares, setSquares] = useState(Array(9).fill(null))
     const [message, setMessage] = useState('Vez de: ')
     const [player, setPlayer] = useState('X')
     const [status, setStatus] = useState('playing')
+    const { updateBoard } = useServer()
+    const firestore = getFirestore(app)
+    const gameRef = collection(firestore, 'game')
+
+    useEffect(() => {
+        getGameBoard()
+    }, [])
+
+    function getGameBoard() {
+        onSnapshot(doc(gameRef, 'rules'), (doc) => {
+            const resp = doc.data()
+            if(resp) {
+                if(resp.gameSquares) {
+                    setSquares(resp.gameSquares)
+                }
+            }
+        })
+    }
 
     const reset = useCallback(() => {
-        setSquares(Array(9).fill(null))
+        updateBoard(Array(9).fill(''))
         setMessage('Vez de:')
         setPlayer('X')
         setStatus('playing')
@@ -17,7 +38,7 @@ export default function useTicTacToe() {
         const squaresArray = [...squares]
         if (squaresArray[pos] || calculateWinner(squaresArray)) return
         squaresArray[pos] = player
-        setSquares(squaresArray)
+        updateBoard(squaresArray)
         if (calculateWinner(squaresArray)) return
         setPlayer(player === 'X' ? 'O' : 'X')
     }, [squares, player])
@@ -47,7 +68,7 @@ export default function useTicTacToe() {
 
         let over = true
         squares.forEach(square => {
-            if (square === null) over = false
+            if (square === '') over = false
         })
         if (over) {
             setMessage('Empate')

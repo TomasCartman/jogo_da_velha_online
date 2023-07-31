@@ -4,7 +4,7 @@ import useServer from "./useServer"
 export default function useSettings() {
     const [id, setId] = useState(-1)
     const [name, setName] = useState('')
-    const {} = useServer()
+    const { getPlayersPlayingNow, addPlayer, addPlayerPlayingNow, getPlayerInfo } = useServer()
 
     useEffect(() => {
         const localId = getId()
@@ -19,8 +19,8 @@ export default function useSettings() {
     }
 
     const getId = useCallback(() => {
-        const localId = localStorage.getItem('id') 
-        return localId ?  +localId : 0
+        const localId = localStorage.getItem('id')
+        return localId ? +localId : 0
     }, [])
 
     const getName = () => {
@@ -33,15 +33,24 @@ export default function useSettings() {
     const clearLocalInfo = () => localStorage.clear()
 
     const createPlayer = localName => {
-       const newId = generateId()
-       setLocalId(newId.toString())
-       setLocalName(localName)
+        const newId = generateId()
+        setLocalId(newId.toString())
+        setLocalName(localName)
+        const player = {
+            id: newId,
+            name: localName
+        }
+        addPlayer(player)
     }
 
     return {
         id,
         name,
         createPlayer,
-        clearLocalInfo
+        clearLocalInfo,
+        getPlayersPlayingNow,
+        addPlayerPlayingNow,
+        getId,
+        getPlayerInfo
     }
 }
