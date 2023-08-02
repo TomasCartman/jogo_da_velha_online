@@ -7,75 +7,53 @@ export default function useTicTacToe() {
     const { gameRef } = repository()
     const { updateBoard, updateIsZeroTurn, getPlayerInfo, updateStatus, updateTurn } = useServer()
     const [squares, setSquares] = useState(Array(9).fill(null))
-    const [message, setMessage] = useState('Vez de: ')
     const [players, setPlayers] = useState([])
-    const [playingNow, setPlayingNow] = useState({})
     const [status, setStatus] = useState('playing')
     const [isZeroTurn, setIsZeroTurn] = useState(true)
     const [turn, setTurn] = useState(0)
 
     useEffect(() => {
-        getRules()
+        getServerInfo()
     }, [])
 
-    const getRules = useCallback(() => {
-        onSnapshot(doc(gameRef, 'rules'), (doc) => {
+    const getServerInfo = useCallback(() => {
+
+        onSnapshot(doc(gameRef, 'gameSquares'), (doc) => {
             const resp = doc.data()
-            if (resp) {
-                console.log(resp)
-                if (resp.gameSquares) {
-                    if (resp.gameSquares != squares) {
-                        setSquares(resp.gameSquares)
-                    }
-                }
-                if (resp.isZeroTurn != null) {
-                    if (resp.isZeroTurn != isZeroTurn) {
-                        setIsZeroTurn(zt => resp.isZeroTurn)
-                    }
-                }
-                if (resp.playingNow != null) {
-                    //setPlayers(p => [])
-                    if (resp.playingNow != playingNow) {
-                        setPlayingNow(resp.playingNow)
-                        resp.playingNow.map(p => {
-                            getPlayerInfo(p)
-                                .then(res => res.data)
-                                .then(res => addNewPlayer(res))
-                        })
-                    }
-                }
-                if (resp.turn != 0) {
-                    if (resp.turn != turn) {
-                        setTurn(t => resp.turn)
-                    }
-                }
-                if (resp.status != null) {
-                    if (resp.status != status) {
-                        setStatus(s => resp.status)
-                        handleMessage(resp.status)
-                    }
-                }
+            setSquares(resp.gameSquares)
+        })
+
+        onSnapshot(doc(gameRef, 'isZeroTurn'), (doc) => {
+            const resp = doc.data()
+            setIsZeroTurn(resp.isZeroTurn)
+        })
+
+        onSnapshot(doc(gameRef, 'playingNow'), (doc) => {
+            const resp = doc.data()
+            if (resp.playingNow != null) {
+                setPlayers(p => [])
+                resp.playingNow.map(p => {
+                    getPlayerInfo(p)
+                        .then(res => res.data)
+                        .then(res => addNewPlayer(res))
+                })
             }
         })
-    }, [])
 
-    function handleMessage(status) {
-        if (status === 'playing') {
-            setMessage(m => 'Vez de:')
-        } else if (status === 'end') {
-            setMessage(m => 'Vencedor:')
-        } else if (status === 'draw') {
-            setMessage(m => 'Empate')
-        }
-    }
+        onSnapshot(doc(gameRef, 'turn'), (doc) => {
+            const resp = doc.data()
+            setTurn(resp.turn)
+        })
+
+        onSnapshot(doc(gameRef, 'status'), (doc) => {
+            const resp = doc.data()
+            setStatus(resp.status)
+        })
+
+    }, [])
 
     function addNewPlayer(player) {
-        setPlayers(newPlayers => {
-            if (newPlayers.length < 2) {
-                return [...newPlayers, player]
-            }
-            return [...newPlayers]
-        })
+        setPlayers(newPlayers => [...newPlayers, player])
     }
 
     const reset = useCallback(() => {
@@ -90,13 +68,11 @@ export default function useTicTacToe() {
         squaresArray[pos] = isZeroTurn ? 'X' : 'O'
         updateBoard(squaresArray)
         if (calculateWinner(squaresArray)) return
-        console.log(players)
-        console.log(players)
         if (players[1] && players[0]) {
             updateTurn(isZeroTurn ? players[1].id : players[0].id)
         }
         updateIsZeroTurn(isZeroTurn ? false : true)
-    }, [squares, isZeroTurn])
+    }, [squares, players, isZeroTurn])
 
 
     const calculateWinner = squares => {
@@ -116,7 +92,6 @@ export default function useTicTacToe() {
         for (let i = 0; i < lines.length; i++) {
             const [a, b, c] = lines[i]
             if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-                //setPlayer(squares[a])
                 updateStatus('end')
                 return squares[a]
             }
@@ -127,7 +102,6 @@ export default function useTicTacToe() {
             if (square === '') over = false
         })
         if (over) {
-            //setPlayer('')
             updateStatus('draw')
             return true
         }
@@ -137,7 +111,6 @@ export default function useTicTacToe() {
 
     return {
         squares,
-        message,
         status,
         isZeroTurn,
         players,

@@ -10,7 +10,7 @@ import { useEffect, useState } from "react"
 
 export default function Game() {
     const { squares, status, isZeroTurn, players, turn, handleClick, reset } = useTicTacToe()
-    const { clearLocalInfo, addPlayerPlayingNow, getId, getName } = useSettings()
+    const { clearLocalInfo, addPlayerPlayingNow, getId } = useSettings()
     const [name, setName] = useState('')
 
     useEffect(() => {
@@ -22,6 +22,12 @@ export default function Game() {
             setPlayerToPlayName(turn)
         }
     }, [players])
+
+    useEffect(() => {
+        if (players.length > 0) {
+            setPlayerToPlayName(turn)
+        }
+    }, [turn])
 
     function squareClick(index) {
         if (turn === getId()) {

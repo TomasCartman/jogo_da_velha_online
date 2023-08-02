@@ -1,4 +1,4 @@
-import { getFirestore, collection, getDocs, doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore'
+import { getFirestore, collection, doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore'
 import app from '@/backend/index'
 
 export default function repository() {
@@ -7,21 +7,13 @@ export default function repository() {
     const playersRef = collection(firestore, 'players')
     const data = { status: 200 }
 
-    const getPlayers = async () => {
-        const playersDoc = doc(playersRef, 'players')
-        const snapshot = await getDoc(playersDoc)
-        const data = {
-            ...snapshot.data()
-        }
-        return data
-    }
-
     const getPlayerInfo = async id => {
         const player = doc(playersRef, id.toString())
         const playerSnap = await getDoc(player)
         return playerSnap.data()
     }
 
+    /*
     const getPlayersPlayingNow = async () => {
         const playingNowDoc = doc(gameRef, 'players')
         const snapshot = await getDoc(playingNowDoc)
@@ -40,9 +32,10 @@ export default function repository() {
 
         return datas
     }
+    */
 
     const getPlayingNow = async () => {
-        const playingNowDoc = doc(gameRef, 'rules')
+        const playingNowDoc = doc(gameRef, 'playingNow')
         const snapshot = await getDoc(playingNowDoc)
         const data = snapshot.data().playingNow
 
@@ -54,23 +47,23 @@ export default function repository() {
     }
 
     const updateBoard = async newBoard => {
-        const rulesDoc = doc(gameRef, 'rules')
+        const rulesDoc = doc(gameRef, 'gameSquares')
         setDoc(rulesDoc, {
             'gameSquares': newBoard
         }, { merge: true })
         return data
     }
 
-    const updateIsZeroTurn = async turn => {
-        const rulesDoc = doc(gameRef, 'rules')
+    const updateIsZeroTurn = async isZeroDown => {
+        const rulesDoc = doc(gameRef, 'isZeroTurn')
         setDoc(rulesDoc, {
-            'isZeroTurn': turn
+            'isZeroTurn': isZeroDown
         }, { merge: true })
         return data
     }
 
     const updateMessage = async message => {
-        const rulesDoc = doc(gameRef, 'rules')
+        const rulesDoc = doc(gameRef, 'message')
         setDoc(rulesDoc, {
             'message': message
         }, { merge: true })
@@ -78,7 +71,7 @@ export default function repository() {
     }
 
     const updateStatus = async status => {
-        const rulesDoc = doc(gameRef, 'rules')
+        const rulesDoc = doc(gameRef, 'status')
         setDoc(rulesDoc, {
             'status': status
         }, { merge: true })
@@ -86,7 +79,7 @@ export default function repository() {
     }
 
     const updateTurn = async turnId => {
-        const rulesDoc = doc(gameRef, 'rules')
+        const rulesDoc = doc(gameRef, 'turn')
         setDoc(rulesDoc, {
             'turn': turnId
         }, { merge: true })
@@ -96,7 +89,7 @@ export default function repository() {
     const addPlayerPlayingNow = async playerId => {
         const playingNow = await getPlayingNow()
         const pnLength = Object.keys(playingNow).length
-        const rulesDoc = doc(gameRef, 'rules')
+        const rulesDoc = doc(gameRef, 'playingNow')
         const data = {}
 
         if (pnLength === 0) {
@@ -131,16 +124,12 @@ export default function repository() {
         return data
     }
 
-    const onPlayersPlayingSnapshot = onSnapshot(doc(gameRef, 'players'), (doc) => {
-        doc.data()
-    })
 
     return {
-        getPlayersPlayingNow,
+        //getPlayersPlayingNow,
         addPlayerPlayingNow,
         getPlayingNow,
         addPlayer,
-        onPlayersPlayingSnapshot,
         getPlayerInfo,
         updateBoard,
         updateIsZeroTurn,
