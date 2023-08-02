@@ -5,6 +5,7 @@ export default function repository() {
     const firestore = getFirestore(app)
     const gameRef = collection(firestore, 'game')
     const playersRef = collection(firestore, 'players')
+    const data = { status: 200 }
 
     const getPlayers = async () => {
         const playersDoc = doc(playersRef, 'players')
@@ -41,7 +42,7 @@ export default function repository() {
     }
 
     const getPlayingNow = async () => {
-        const playingNowDoc = doc(gameRef, 'players')
+        const playingNowDoc = doc(gameRef, 'rules')
         const snapshot = await getDoc(playingNowDoc)
         const data = snapshot.data().playingNow
 
@@ -56,25 +57,58 @@ export default function repository() {
         const rulesDoc = doc(gameRef, 'rules')
         setDoc(rulesDoc, {
             'gameSquares': newBoard
-        })
+        }, { merge: true })
+        return data
+    }
+
+    const updateIsZeroTurn = async turn => {
+        const rulesDoc = doc(gameRef, 'rules')
+        setDoc(rulesDoc, {
+            'isZeroTurn': turn
+        }, { merge: true })
+        return data
+    }
+
+    const updateMessage = async message => {
+        const rulesDoc = doc(gameRef, 'rules')
+        setDoc(rulesDoc, {
+            'message': message
+        }, { merge: true })
+        return data
+    }
+
+    const updateStatus = async status => {
+        const rulesDoc = doc(gameRef, 'rules')
+        setDoc(rulesDoc, {
+            'status': status
+        }, { merge: true })
+        return data
+    }
+
+    const updateTurn = async turnId => {
+        const rulesDoc = doc(gameRef, 'rules')
+        setDoc(rulesDoc, {
+            'turn': turnId
+        }, { merge: true })
+        return data
     }
 
     const addPlayerPlayingNow = async playerId => {
         const playingNow = await getPlayingNow()
         const pnLength = Object.keys(playingNow).length
-        const playerDoc = doc(gameRef, 'players')
+        const rulesDoc = doc(gameRef, 'rules')
         const data = {}
 
         if (pnLength === 0) {
-            setDoc(playerDoc, {
-                'playingNow': { 0: playerId }
-            })
+            setDoc(rulesDoc, {
+                'playingNow': [ playerId ]
+            }, { merge: true })
             data.status = 200
             return data
         } else if (pnLength === 1) {
             if (playingNow[0] !== playerId) {
-                setDoc(playerDoc, {
-                    'playingNow': { 1: playerId }
+                setDoc(rulesDoc, {
+                    'playingNow': [...playingNow, playerId]
                 }, { merge: true })
                 data.status = 200
                 return data
@@ -98,7 +132,7 @@ export default function repository() {
     }
 
     const onPlayersPlayingSnapshot = onSnapshot(doc(gameRef, 'players'), (doc) => {
-         doc.data()
+        doc.data()
     })
 
     return {
@@ -108,6 +142,12 @@ export default function repository() {
         addPlayer,
         onPlayersPlayingSnapshot,
         getPlayerInfo,
-        updateBoard
+        updateBoard,
+        updateIsZeroTurn,
+        updateMessage,
+        updateStatus,
+        updateTurn,
+        gameRef,
+        playersRef
     }
 }

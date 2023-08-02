@@ -12,6 +12,6 @@ export default async function handler(req, res) {
     else if(req.method === "POST") {
         const player = req.body
         const playerResponse = await addPlayer(player)
-        res.status(200)
+        res.status(200).json(playerResponse)
     }
 }

@@ -51,6 +51,7 @@ export default function useSettings() {
         getPlayersPlayingNow,
         addPlayerPlayingNow,
         getId,
+        getName,
         getPlayerInfo
     }
 }

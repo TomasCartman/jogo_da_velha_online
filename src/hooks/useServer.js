@@ -28,12 +28,32 @@ export default function useServer() {
         return await axios.post('/api/game/rules/gameSquares', { newBoard })
     }
 
+    const updateIsZeroTurn = async turn => {
+        return await axios.post('/api/game/rules/isZeroTurn', { turn })
+    }
+
+    const updateTurn = async turnId => {
+        return await axios.post('/api/game/rules/turn', { turnId })
+    }
+
+    const updateMessage = async message => {
+        return await axios.post('/api/game/rules/message', { message })
+    }
+
+    const updateStatus = async status => {
+        return await axios.post('/api/game/rules/status', { status })
+    }
+
     return {
         getPlayersPlayingNow,
         addPlayer,
         addPlayerPlayingNow,
         playersPlayingNowSnapshot,
         getPlayerInfo,
-        updateBoard
+        updateBoard,
+        updateIsZeroTurn,
+        updateTurn,
+        updateMessage,
+        updateStatus
     }
 }

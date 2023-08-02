@@ -1,9 +1,12 @@
 export default function PlayingNowBox({ players }) {
 
     function renderPlayers() {
-        console.log(players)
-        return players.map(player => {
-            return <span key={player.id}>{player.name}</span>
+        return players.map((player, index) => {
+            return <span
+                key={player.id}
+                className={`${index ? 'text-green-400' : 'text-red-500'} text-base sm:text-xl`}
+            >{player.name}
+            </span>
         })
     }
 
@@ -13,7 +16,7 @@ export default function PlayingNowBox({ players }) {
             border bg-zinc-800 rounded-md
             py-2 px-4
         `}>
-            <span className="text-2xl mb-4">Jogando:</span>
+            <span className="text-base sm:text-lg mb-4 text-white">Jogando</span>
             {renderPlayers()}
         </div>
     )
