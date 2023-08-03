@@ -18,6 +18,8 @@ export default function Messages({ status, playerName, isZeroTurn }) {
             )
         } else if (status === 'draw') {
             return <span className="text-xl sm:text-3xl">Empate</span>
+        } else if(status === 'waiting') {
+            return <span className="text-xl sm:text-3xl">Aguardando jogadores</span>
         }
     }
 

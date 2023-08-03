@@ -44,6 +44,14 @@ export default function useServer() {
         return await axios.post('/api/game/rules/status', { status })
     }
 
+    const resetPlayersPlayingNow = async () => {
+        return await axios.post('/api/game/reset')
+    }
+
+    const updateTimestamp = async time => {
+        return await axios.post('/api/game/rules/time', { time })
+    }
+
     return {
         getPlayersPlayingNow,
         addPlayer,
@@ -54,6 +62,8 @@ export default function useServer() {
         updateIsZeroTurn,
         updateTurn,
         updateMessage,
-        updateStatus
+        updateStatus,
+        resetPlayersPlayingNow,
+        updateTimestamp
     }
 }

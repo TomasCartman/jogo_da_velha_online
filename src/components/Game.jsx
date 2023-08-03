@@ -9,9 +9,10 @@ import Button from "@/components/Button"
 import { useEffect, useState } from "react"
 
 export default function Game() {
-    const { squares, status, isZeroTurn, players, turn, handleClick, reset } = useTicTacToe()
+    const { squares, status, isZeroTurn, players, turn, playingNowName, handleClick,
+        setPlayerToPlayName, isPlayerPlaying, forceDraw } = useTicTacToe()
     const { clearLocalInfo, addPlayerPlayingNow, getId } = useSettings()
-    const [name, setName] = useState('')
+    const [showButtonPlayAgain, setShowButtonPlayAgain] = useState(false)
 
     useEffect(() => {
         addPlayerPlayingNow(getId())
@@ -29,15 +30,23 @@ export default function Game() {
         }
     }, [turn])
 
+    useEffect(() => {
+        if (status === 'end' || status === 'draw' || (status === 'waiting' && !isPlayerPlaying())) {
+            setTimeout(() => {
+                setShowButtonPlayAgain(true)
+            }, 4000)
+        }
+    }, [status])
+
     function squareClick(index) {
         if (turn === getId()) {
             handleClick(index)
         }
     }
 
-    function setPlayerToPlayName(id) {
-        const player = players.find(p => p.id === id)
-        if (player !== undefined) setName(player.name)  
+    function playAgain() {
+        addPlayerPlayingNow(getId())
+        setShowButtonPlayAgain(false)
     }
 
     function renderSquares() {
@@ -53,13 +62,13 @@ export default function Game() {
         <div className={`
             flex justify-center items-center flex-col gap-8
             w-5/5
-            lg:w-2/5 h-full 
+            lg:w-3/5 h-full 
         `}>
-            <div className="grow-2 mt-12">
+            <div className="grow-1 mt-2 lg:grow-2 lg:mt-12">
                 <PlayingNowBox players={players} />
             </div>
             <div className="flex text-3xl text-white">
-                <Messages playerName={name} status={status} isZeroTurn={isZeroTurn} />
+                <Messages playerName={playingNowName} status={status} isZeroTurn={isZeroTurn} />
             </div>
             <div className="grow-3">
                 <div className={`
@@ -70,9 +79,12 @@ export default function Game() {
                 </div>
             </div>
             <div className="grow-3">
-                {(status === 'end' || status === 'draw') && <Button text='Reiniciar' onClick={reset} />}
+                {showButtonPlayAgain && <Button text='Jogar Novamente' onClick={playAgain} />}
             </div>
-            <button onClick={clearLocalInfo}>Resetar id</button>
+            <div className="flex gap-2">
+                <button onClick={clearLocalInfo}>Resetar id</button>
+                <button onClick={forceDraw}>Forçar empate</button>
+            </div>
         </div>
     )
 }

@@ -2,19 +2,52 @@ import { useCallback, useEffect, useState } from "react"
 import { doc, onSnapshot } from 'firebase/firestore'
 import useServer from "./useServer"
 import repository from "@/services/repository"
+import useSettings from "./useSettings"
 
 export default function useTicTacToe() {
     const { gameRef } = repository()
-    const { updateBoard, updateIsZeroTurn, getPlayerInfo, updateStatus, updateTurn } = useServer()
+    const { updateBoard, updateIsZeroTurn, getPlayerInfo, updateStatus, updateTurn,
+        resetPlayersPlayingNow, updateTimestamp } = useServer()
+    const { getId } = useSettings()
     const [squares, setSquares] = useState(Array(9).fill(null))
     const [players, setPlayers] = useState([])
     const [status, setStatus] = useState('playing')
     const [isZeroTurn, setIsZeroTurn] = useState(true)
     const [turn, setTurn] = useState(0)
+    const [time, setTime] = useState(0)
+    const [playingNowName, setPlayingNowName] = useState('')
 
     useEffect(() => {
         getServerInfo()
+        updateTimestamp(Date.now())
     }, [])
+
+    useEffect(() => {
+        if (status === 'end' || status === 'draw') {
+            setTimeout(() => {
+                setPlayers(p => [])
+                resetPlayersPlayingNow()
+                reset()
+                updateTimestamp(Date.now())
+            }, 4000)
+        }
+    }, [status])
+
+    useEffect(() => {
+        if (players.length === 2 && status === 'waiting') {
+            updateStatus('playing')
+            updateTurn(players[0].id)
+            updateTimestamp(Date.now())
+        }
+    }, [players, status])
+
+    useEffect(() => {
+        if ((time  - 1000 * 60) > Date.now()) {
+            setPlayers(p => [])
+            resetPlayersPlayingNow()
+            reset()
+        }
+    }, [time])
 
     const getServerInfo = useCallback(() => {
 
@@ -30,14 +63,14 @@ export default function useTicTacToe() {
 
         onSnapshot(doc(gameRef, 'playingNow'), (doc) => {
             const resp = doc.data()
-            if (resp.playingNow != null) {
-                setPlayers(p => [])
-                resp.playingNow.map(p => {
-                    getPlayerInfo(p)
-                        .then(res => res.data)
-                        .then(res => addNewPlayer(res))
-                })
-            }
+
+            setPlayers(p => [])
+            resp.playingNow.map(p => {
+                getPlayerInfo(p)
+                    .then(res => res.data)
+                    .then(res => addNewPlayer(res))
+            })
+
         })
 
         onSnapshot(doc(gameRef, 'turn'), (doc) => {
@@ -50,17 +83,42 @@ export default function useTicTacToe() {
             setStatus(resp.status)
         })
 
+        onSnapshot(doc(gameRef, 'time'), (doc) => {
+            const resp = doc.data()
+            setTime(resp.time)
+        })
+
     }, [])
 
     function addNewPlayer(player) {
-        setPlayers(newPlayers => [...newPlayers, player])
+        setPlayers(newPlayers => {
+            if(!isPlayerPlaying()) return [...newPlayers, player]
+            return [...newPlayers]
+        })
+    }
+
+    const forceDraw = () => {
+        updateStatus('draw')
     }
 
     const reset = useCallback(() => {
         updateBoard(Array(9).fill(''))
         updateIsZeroTurn(true)
-        updateStatus('playing')
+        updateStatus('waiting')
     }, [])
+
+    function setPlayerToPlayName(id) {
+        const player = getPlayerById(id)
+        if (player !== undefined) setPlayingNowName(player.name)
+    }
+
+    function getPlayerById(id) {
+        return players.find(p => p.id === id)
+    }
+
+    function isPlayerPlaying() {
+        return getPlayerById(getId()) !== undefined
+    }
 
     const handleClick = useCallback((pos) => {
         const squaresArray = [...squares]
@@ -69,9 +127,10 @@ export default function useTicTacToe() {
         updateBoard(squaresArray)
         if (calculateWinner(squaresArray)) return
         if (players[1] && players[0]) {
-            updateTurn(isZeroTurn ? players[1].id : players[0].id)
+            updateTurn(players[0].id === turn ? players[1].id : players[0].id)
         }
         updateIsZeroTurn(isZeroTurn ? false : true)
+        updateTimestamp(Date.now())
     }, [squares, players, isZeroTurn])
 
 
@@ -115,7 +174,11 @@ export default function useTicTacToe() {
         isZeroTurn,
         players,
         turn,
+        playingNowName,
         handleClick,
-        reset
+        reset,
+        setPlayerToPlayName,
+        isPlayerPlaying,
+        forceDraw
     }
 }

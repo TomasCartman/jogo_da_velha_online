@@ -43,7 +43,11 @@ export default function repository() {
     }
 
     const resetPlayersPlayingNow = async () => {
-
+        const rulesDoc = doc(gameRef, 'playingNow')
+        setDoc(rulesDoc, {
+            'playingNow': []
+        }, { merge: true })
+        return data
     }
 
     const updateBoard = async newBoard => {
@@ -82,6 +86,14 @@ export default function repository() {
         const rulesDoc = doc(gameRef, 'turn')
         setDoc(rulesDoc, {
             'turn': turnId
+        }, { merge: true })
+        return data
+    }
+
+    const updateTimestamp = async time => {
+        const rulesDoc = doc(gameRef, 'time')
+        setDoc(rulesDoc, {
+            'time': time
         }, { merge: true })
         return data
     }
@@ -126,7 +138,6 @@ export default function repository() {
 
 
     return {
-        //getPlayersPlayingNow,
         addPlayerPlayingNow,
         getPlayingNow,
         addPlayer,
@@ -136,6 +147,8 @@ export default function repository() {
         updateMessage,
         updateStatus,
         updateTurn,
+        resetPlayersPlayingNow,
+        updateTimestamp,
         gameRef,
         playersRef
     }
