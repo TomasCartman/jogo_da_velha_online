@@ -1,25 +1,7 @@
-import '@/styles/globals.css'
-import Game from "@/components/Game"
-import useSettings from '@/hooks/useSettings'
-
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import Index from "@/components/Index"
 
 export default function index() {
-    const { id } = useSettings()
-    const router = useRouter()
-
-    useEffect(() => {
-       id || router.replace('/config')
-    }, [id])
-
     return (
-        <main className={`
-            w-full bg-zinc-900 h-screen
-            flex justify-center items-center
-        `}
-        >
-            {id ? <Game /> : ''} 
-        </main>
+        <Index />
     )
 }

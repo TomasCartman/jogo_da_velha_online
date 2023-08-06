@@ -12,16 +12,16 @@ export default function useSettings() {
         setName(getName())
     }, [])
 
+    const getId =() => {
+        const localId = localStorage.getItem('id')
+        return localId ? +localId : 0
+    }
+
     const generateId = () => {
         const max = 9999999
         const min = 1000000
         return Math.floor(Math.random() * (max - min + 1) + min)
     }
-
-    const getId = useCallback(() => {
-        const localId = localStorage.getItem('id')
-        return localId ? +localId : 0
-    }, [])
 
     const getName = () => {
         const localName = localStorage.getItem('name')
