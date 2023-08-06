@@ -1,6 +1,6 @@
 export default function InputForm({ value, changeValue }) {
     return (
-        <div>
+        <div className="flex flex-col gap-2">
             <label
                 className={`
                 px-2 text-2xl text-white
@@ -9,7 +9,7 @@ export default function InputForm({ value, changeValue }) {
             <input
                 className={`
                 text-white p-1 mx-2 bg-zinc-700
-                rounded-md text-2xl
+                rounded-md text-2xl 
             `}
                 type="text"
                 value={value}
