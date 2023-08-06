@@ -1,11 +1,6 @@
 import axios from "axios"
 
 export default function useServer() {
-
-    const getPlayersPlayingNow = async () => {
-        return await axios.get('/api/game/players')
-    }
-
     const addPlayer = async player => {
         return await axios.post('/api/players', player)
             .then(data => data.data)
@@ -53,7 +48,6 @@ export default function useServer() {
     }
 
     return {
-        getPlayersPlayingNow,
         addPlayer,
         addPlayerPlayingNow,
         playersPlayingNowSnapshot,

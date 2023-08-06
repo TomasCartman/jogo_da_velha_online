@@ -3,7 +3,7 @@ export default function InputForm({ value, changeValue }) {
         <div>
             <label
                 className={`
-                px-2 text-2xl
+                px-2 text-2xl text-white
                 `}
             >Você é?</label>
             <input

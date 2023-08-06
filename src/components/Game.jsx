@@ -6,51 +6,24 @@ import useSettings from "@/hooks/useSettings"
 import Messages from "@/components/Messages"
 import PlayingNowBox from "@/components/PlayingNowBox"
 import Button from "@/components/Button"
-import { useEffect, useState } from "react"
 
 export default function Game() {
-    const { squares, status, isZeroTurn, players, turn, playingNowName, handleClick,
-        setPlayerToPlayName, isPlayerPlaying, forceDraw } = useTicTacToe()
-    const { clearLocalInfo, addPlayerPlayingNow, getId } = useSettings()
-    const [showButtonPlayAgain, setShowButtonPlayAgain] = useState(false)
-
-    useEffect(() => {
-        addPlayerPlayingNow(getId())
-    }, [])
-
-    useEffect(() => {
-        if (players.length > 0) {
-            setPlayerToPlayName(turn)
-        }
-    }, [players])
-
-    useEffect(() => {
-        if (players.length > 0) {
-            setPlayerToPlayName(turn)
-        }
-    }, [turn])
-
-    useEffect(() => {
-        if (status === 'end' || status === 'draw' || (status === 'waiting' && !isPlayerPlaying())) {
-            setTimeout(() => {
-                setShowButtonPlayAgain(true)
-            }, 4000)
-        }
-    }, [status])
+    const { serverSquares, status, isZeroTurn, players, turnId, playingNowName, showButtonPlayAgain,
+        handleClick, forceDraw, addPlayerIfValidLocalId } = useTicTacToe()
+    const { clearLocalInfo, getId } = useSettings()
 
     function squareClick(index) {
-        if (turn === getId()) {
+        if (turnId === getId()) {
             handleClick(index)
         }
     }
 
     function playAgain() {
-        addPlayerPlayingNow(getId())
-        setShowButtonPlayAgain(false)
+        addPlayerIfValidLocalId()
     }
 
     function renderSquares() {
-        return squares.map((square, index) => {
+        return serverSquares.map((square, index) => {
             return <Square
                 key={`square${index}`}
                 onClick={() => squareClick(index)}

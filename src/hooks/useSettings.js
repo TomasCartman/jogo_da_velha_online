@@ -4,7 +4,7 @@ import useServer from "./useServer"
 export default function useSettings() {
     const [id, setId] = useState(-1)
     const [name, setName] = useState('')
-    const { getPlayersPlayingNow, addPlayer, addPlayerPlayingNow, getPlayerInfo } = useServer()
+    const { addPlayer, addPlayerPlayingNow, getPlayerInfo } = useServer()
 
     useEffect(() => {
         const localId = getId()
@@ -48,7 +48,6 @@ export default function useSettings() {
         name,
         createPlayer,
         clearLocalInfo,
-        getPlayersPlayingNow,
         addPlayerPlayingNow,
         getId,
         getName,

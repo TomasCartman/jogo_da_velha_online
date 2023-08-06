@@ -27,7 +27,7 @@ export default function config() {
             w-full bg-zinc-900 h-screen
             flex justify-center items-center flex-col gap-16
         `}>
-            <span className='text-4xl align-middle'>Parece que é sua primeira vez aqui...</span>
+            <span className='text-4xl text-white align-middle'>Parece que é sua primeira vez aqui...</span>
             <InputForm value={name} changeValue={changeName} />
             <Button text='Continuar' onClick={onContinueClick}>
                 <MdOutlineKeyboardArrowRight size={24} />
