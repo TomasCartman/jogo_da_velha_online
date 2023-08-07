@@ -8,7 +8,7 @@ export default function useTicTacToe() {
     const { gameRef } = repository()
     const { updateBoard, updateIsZeroTurn, getPlayerInfo, updateStatus, updateTurn,
         resetPlayersPlayingNow } = useServer()
-    const { getId, addPlayerPlayingNow } = useSettings()
+    const { getLocalId, addPlayerPlayingNow } = useSettings()
     const [serverSquares, setServerSquares] = useState(Array(9).fill(null))
     const [players, setPlayers] = useState([])
     const [status, setStatus] = useState('waiting')
@@ -31,13 +31,13 @@ export default function useTicTacToe() {
     }, [status])
 
     useEffect(() => {
-        if (players.length === 2 && status === 'waiting') {
+        if (players.length === 2 && status === 'waiting' && getPlayerZeroId() === getLocalId()) {
             updateStatus('playing')
-            updateTurn(players[0].id)
-        } else if(players.length < 2) {
+            updateTurn(getPlayerZeroId())
+        } else if (players.length < 2) {
             updateStatus('waiting')
         }
-        if((status === 'end' || status === 'draw' || status === 'waiting') && !isPlayerPlaying()) {
+        if ((status === 'end' || status === 'draw' || status === 'waiting') && !isPlayerPlaying()) {
             setShowButtonPlayAgain(sbpa => true)
         } else {
             setShowButtonPlayAgain(sbpa => false)
@@ -82,16 +82,16 @@ export default function useTicTacToe() {
     }
 
     function addPlayerIfValidLocalId() {
-        if(!isPlayerPlaying()) {
-            const id = getId()
-            if(id) {
+        if (!isPlayerPlaying()) {
+            const id = getLocalId()
+            if (id) {
                 addPlayerPlayingNow(id)
             }
         }
     }
 
     function isPlayerPlaying() {
-        return getPlayerByIdInPlayersPlayingNow(getId()) !== undefined
+        return getPlayerByIdInPlayersPlayingNow(getLocalId()) !== undefined
     }
 
     const resetBoardAndStatusAndIsZeroTurn = () => {
@@ -109,7 +109,7 @@ export default function useTicTacToe() {
 
     function addNewPlayer(player) {
         setPlayers(newPlayers => {
-            if(!isPlayerPlaying()) return [...newPlayers, player]
+            if (!isPlayerPlaying()) return [...newPlayers, player]
             return [...newPlayers]
         })
     }
@@ -139,11 +139,11 @@ export default function useTicTacToe() {
 
     const calculateWinner = squares => {
         const winner = getWinner(squares)
-        if(winner) return winner
-        
+        if (winner) return winner
+
         const isDraw = isGameDraw(squares)
         if (isDraw) return isDraw
-        
+
         return null
     }
 
@@ -180,8 +180,11 @@ export default function useTicTacToe() {
     }
 
     function changeTurn() {
-        updateTurn(players[0].id === turnId ? players[1].id : players[0].id)
+        updateTurn(getPlayerZeroId() === turnId ? getPlayerOneId() : getPlayerZeroId())
     }
+
+    const getPlayerZeroId = () => players[0].id
+    const getPlayerOneId = () => players[1].id
 
     return {
         serverSquares,

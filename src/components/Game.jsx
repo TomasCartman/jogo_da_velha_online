@@ -10,10 +10,10 @@ import Button from "@/components/Button"
 export default function Game() {
     const { serverSquares, status, isZeroTurn, players, turnId, playingNowName, showButtonPlayAgain,
         handleClick, forceDraw, addPlayerIfValidLocalId } = useTicTacToe()
-    const { clearLocalInfo, getId } = useSettings()
+    const { clearLocalInfo, getLocalId } = useSettings()
 
     function squareClick(index) {
-        if (turnId === getId()) {
+        if (turnId === getLocalId()) {
             handleClick(index)
         }
     }

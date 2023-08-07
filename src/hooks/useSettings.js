@@ -7,12 +7,12 @@ export default function useSettings() {
     const { addPlayer, addPlayerPlayingNow, getPlayerInfo } = useServer()
 
     useEffect(() => {
-        const localId = getId()
+        const localId = getLocalId()
         setId(localId)
         setName(getName())
     }, [])
 
-    const getId =() => {
+    const getLocalId = () => {
         const localId = localStorage.getItem('id')
         return localId ? +localId : 0
     }
@@ -49,7 +49,7 @@ export default function useSettings() {
         createPlayer,
         clearLocalInfo,
         addPlayerPlayingNow,
-        getId,
+        getLocalId,
         getName,
         getPlayerInfo
     }
